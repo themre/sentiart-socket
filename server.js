@@ -2,31 +2,31 @@
 // var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 
-//
-'use strict';
 
-let history = [];
+
 const express = require('express');
-const SocketServer = require('ws').Server;
+const socketIO = require('socket.io');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'index.html');
 
+let history = ["testUrl"];
+
 const server = express()
   .use((req, res) => res.sendFile(INDEX) )
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-const wss = new SocketServer({ server });
+const io = socketIO(server);
 
-wss.on('connection', (ws) => {
+io.on('connection', (socket) => {
   function send() {
     io.emit('wms send', history);
   }
   console.log('Client connected');
   send();
-  ws.on('close', () => console.log('Client disconnected'));
-  ws.on('wms send', (msg) => {
+  socket.on('disconnect', () => console.log('Client disconnected'));
+  socket.on('wms send', () => {
     while (history.length > 30) {
       history.shift()
     }
@@ -34,6 +34,44 @@ wss.on('connection', (ws) => {
     send()
   });
 });
+
+setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+//
+
+
+// const express = require('express');
+// const SocketServer = require('ws').Server;
+// const path = require('path');
+
+// const PORT = process.env.PORT || 3000;
+// const INDEX = path.join(__dirname, 'index.html');
+
+// const server = express()
+//   .use((req, res) => res.sendFile(INDEX) )
+//   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+
+// const wss = new SocketServer({ server });
+
+// wss.on('connection', (ws) => {
+//   function send() {
+//     io.emit('wms send', history);
+//   }
+//   console.log('Client connected');
+//   send();
+//   ws.on('close', () => console.log('Client disconnected'));
+//   ws.on('wms send', (msg) => {
+//     while (history.length > 30) {
+//       history.shift()
+//     }
+//     history.push(msg);
+//     send()
+//   });
+// });
+// setInterval(() => {
+//   wss.clients.forEach((client) => {
+//     client.send(new Date().toTimeString());
+//   });
+// }, 1000);
 
 // setInterval(() => {
 //   wss.clients.forEach((client) => {
