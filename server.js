@@ -5,17 +5,13 @@ const path = require('path');
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'index.html');
 
-let history = ["testUrl"];
+let history = [];
 
 const server = express()
   .use((req, res) => res.sendFile(INDEX) )
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 const io = socketIO(server);
-// io.configure(function () { 
-//   io.set("transports", ["xhr-polling"]); 
-//   io.set("polling duration", 10); 
-// });
 
 io.on('connection', (socket) => {
   function send() {
@@ -33,5 +29,3 @@ io.on('connection', (socket) => {
     send()
   });
 });
-
-// setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
