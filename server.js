@@ -24,7 +24,8 @@ io.on('connection', (socket) => {
   console.log('Client connected');
   send();
   socket.on('disconnect', () => console.log('Client disconnected'));
-  socket.on('wms send', () => {
+  socket.on('wms send', (msg) => {
+    console.log("wms send");
     while (history.length > 30) {
       history.shift()
     }
